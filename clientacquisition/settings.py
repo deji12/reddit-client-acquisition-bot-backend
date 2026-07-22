@@ -32,6 +32,7 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS').split(',')
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'import_export',
 ]
 
 MIDDLEWARE = [
@@ -117,3 +119,63 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_RESULT_BACKEND = 'rpc://'  # For RabbitMQ
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = "Africa/Lagos"
+CELERY_ENABLE_UTC = False
+CELERY_RESULT_EXTENDED = True
+
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60  # 30
+
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": True,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": False,
+    "accent": "accent-olive",
+    "navbar": "navbar-white navbar-light",
+    "no_navbar_border": False,
+    "navbar_fixed": True,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": False,
+    "sidebar": "sidebar-dark-primary",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "default",
+    "button_classes": {
+        "primary": "btn-outline-primary",
+        "secondary": "btn-outline-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    },
+    "actions_sticky_top": False
+}
+
+
+JAZZMIN_SETTINGS = {
+    "topmenu_links": [
+
+        # {"name": "Home",  "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"app": "core"}
+    ],
+    "show_ui_builder": False,
+
+    "copyright": "Reddit Recruiter",
+
+    "site_title": "Reddit Recruiter",
+    "site_header": "Reddit Recruiter",
+}
