@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',
     'import_export',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -179,3 +180,5 @@ JAZZMIN_SETTINGS = {
     "site_title": "Reddit Recruiter",
     "site_header": "Reddit Recruiter",
 }
+
+# celery -A clientacquisition beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
