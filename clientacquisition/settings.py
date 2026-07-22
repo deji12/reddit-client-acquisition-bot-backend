@@ -179,6 +179,10 @@ JAZZMIN_SETTINGS = {
 
     "site_title": "Reddit Recruiter",
     "site_header": "Reddit Recruiter",
+
+    "changeform_format_overrides": {
+        "core.postlead": "horizontal_tabs",
+    },
 }
 
 # celery -A clientacquisition beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler

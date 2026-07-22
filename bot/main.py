@@ -22,47 +22,46 @@ def fetch_posts_from_subredits():
     
     for subreddit in subreddits:
         print(f'-> Processing {subreddit.name}')
-        subreddit_posts = subreddit.posts.all()
-        if subreddit_posts.count() == 0:
-            subreddit_name = subreddit.name.removeprefix("r/")
+        
+        subreddit_name = subreddit.name.removeprefix("r/")
 
-            try:
-                print(f'-> Fetching posts for {subreddit.name}')
-                submissions = reddit.subreddit(subreddit_name).new(limit=3)
+        try:
+            print(f'-> Fetching posts for {subreddit.name}')
+            submissions = reddit.subreddit(subreddit_name).new(limit=3)
+            
+            for submission in submissions:
                 
-                for submission in submissions:
-                    
-                    content = submission.selftext
-                    if not content:
-                        continue
-                    
-                    print('rerieving--------------------------------------------------')
-                    post, created = PostLead.objects.get_or_create(
-                        post_id=submission.id,
-                        subreddit = subreddit
-                        )
+                content = submission.selftext
+                if not content:
+                    continue
+                
+                print('rerieving--------------------------------------------------')
+                post, created = PostLead.objects.get_or_create(
+                    post_id=submission.id,
+                    subreddit = subreddit
+                    )
 
-                    # if this lead already exists, skip it
-                    if not created:
-                        continue
+                # if this lead already exists, skip it
+                if not created:
+                    continue
 
-                    total_fetched += 1
+                total_fetched += 1
 
-                    post.subreddit = subreddit
-                    post.author_username = submission.author
-                    post.content = content
-                    post.number_of_comments = submission.num_comments
-                    post.url = submission.url
-                    post.posted_when = format_timestamp(submission.created_utc)
-                    post.save()
-                    
-                    print(f"-> Saved post with ID: {submission.id} from subreddit: {subreddit.name}")
+                post.subreddit = subreddit
+                post.author_username = submission.author
+                post.content = content
+                post.number_of_comments = submission.num_comments
+                post.url = submission.url
+                post.posted_when = format_timestamp(submission.created_utc)
+                post.save()
+                
+                print(f"-> Saved post with ID: {submission.id} from subreddit: {subreddit.name}")
 
 
-                    tracker.last_fetched_subreddit = subreddit.name
+                tracker.last_fetched_subreddit = subreddit.name
 
-            except (Redirect, NotFound):
-                continue
+        except (Redirect, NotFound):
+            continue
 
     tracker.total_fetched_posts = total_fetched
     tracker.save()
