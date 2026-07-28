@@ -16,6 +16,9 @@ def fetch_posts_from_subredits():
         .first()
     )
 
+    if not account:
+        return "No active accounts for today"
+
     if not (account.client_id and account.client_secret):
         return "No client ID or secret found for this account"
     
