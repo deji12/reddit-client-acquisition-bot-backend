@@ -178,6 +178,35 @@ JAZZMIN_SETTINGS = {
     ],
     "show_ui_builder": False,
 
+    "icons": {
+        # Main app/group icon
+        "core": "fab fa-reddit",
+
+        # Model icons
+        "core.EmailForNotification": "fas fa-envelope",
+        "core.RedditBotAccount": "fas fa-robot",
+        "core.Tracker": "fas fa-tasks",
+        "core.Subreddit": "fab fa-reddit-alien",
+        "core.PostLead": "fas fa-bullseye",
+
+        # Celery Beat
+        "django_celery_beat": "fas fa-clock",
+        "django_celery_beat.PeriodicTask": "fas fa-sync-alt",
+        "django_celery_beat.IntervalSchedule": "fas fa-hourglass-half",
+        "django_celery_beat.CrontabSchedule": "fas fa-calendar-alt",
+        "django_celery_beat.ClockedSchedule": "fas fa-stopwatch",
+        "django_celery_beat.SolarSchedule": "fas fa-sun",
+
+        # Optional Django authentication icons
+        "auth": "fas fa-users-cog",
+        "auth.User": "fas fa-user",
+        "auth.Group": "fas fa-users",
+    },
+
+    # Fallback icons
+    "default_icon_parents": "fas fa-folder",
+    "default_icon_children": "fas fa-circle",
+
     "copyright": "Reddit Recruiter",
 
     "site_title": "Reddit Recruiter",
@@ -187,6 +216,15 @@ JAZZMIN_SETTINGS = {
         "core.postlead": "horizontal_tabs",
     },
 }
+
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT', cast=int)
+EMAIL_USE_SSL = config('EMAIL_USE_SSL', cast=bool)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # uv run celery -A clientacquisition worker --pool=gevent --loglevel=info
 # uv run celery -A clientacquisition beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
