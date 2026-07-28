@@ -4,7 +4,6 @@ from .utils import format_timestamp, categorize, save_analyses
 from decouple import config as env_config
 from core.models import Subreddit, PostLead, Tracker, RedditBotAccount
 from django.utils import timezone
-from core.tasks import alert_on_categorization_completion
 
 def fetch_posts_from_subredits():
 
@@ -162,6 +161,8 @@ def categorize_posts():
 
     bot_account.last_run = timezone.now()
     bot_account.save(update_fields=['last_run'])
+
+    from core.tasks import alert_on_categorization_completion
 
     alert_on_categorization_completion.delay(
         email=bot_account.categorization_complete_email_recipient.email
