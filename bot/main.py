@@ -5,6 +5,8 @@ from decouple import config as env_config
 from core.models import Subreddit, PostLead, Tracker, RedditBotAccount
 from django.utils import timezone
 
+# MAKE THE AI TIME AWARE
+
 def fetch_posts_from_subredits():
 
     account = (
