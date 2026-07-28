@@ -1,5 +1,61 @@
 from django.db import models
 
+class EmailForNotification(models.Model):
+    email = models.EmailField(
+        help_text=(
+            "The email to be notified when post fetching and categorization is complete"
+        )
+    )
+
+    def __str__(self):
+        return self.email
+
+class RedditBotAccount(models.Model):
+
+    categorization_complete_email_recipient = models.ForeignKey(
+        EmailForNotification,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        help_text=(
+            "The email address that will be notified when the AI has finished fetching and categorizing posts"
+        )
+    )
+
+    client_id = models.CharField(
+        max_length=100,
+        help_text=(
+            "The client ID of this account gotten from https://www.reddit.com/prefs/apps "
+        )
+    )
+    client_secret = models.CharField(
+        max_length=150,
+        help_text=(
+            "The client secret of this account gotten from https://www.reddit.com/prefs/apps "
+        )
+    )
+    user_agent = models.CharField(
+        max_length=20,
+        help_text=(
+            "The user agent of this account"
+        ),
+        default=""
+    )
+    is_active = models.BooleanField(
+        default=False,
+        help_text=(
+            "This activates or deactivates a bot account "
+        )
+    )
+    last_run = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="When last this bot account ran"
+    )
+
+    def __str__(self):
+        return self.client_id
+
 
 class Tracker(models.Model):
     last_fetched_subreddit = models.CharField(
@@ -23,6 +79,7 @@ class Tracker(models.Model):
 
 
 class Subreddit(models.Model):
+
     name = models.CharField(
         max_length=50,
         help_text=(
@@ -46,6 +103,16 @@ class PostLead(models.Model):
         PROPOSAL_SENT = "Proposal sent", "Proposal sent"
         WON = "Won", "Won"
         LOST = "Lost", "Lost"
+
+    account = models.ForeignKey(
+        RedditBotAccount,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        help_text=(
+            "The bot account that fetched this post lead"
+        ) 
+    )
 
     subreddit = models.ForeignKey(
         Subreddit,

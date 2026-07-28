@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Tracker, Subreddit, PostLead
+from .models import Tracker, Subreddit, PostLead, RedditBotAccount, EmailForNotification
 from import_export.admin import ImportExportModelAdmin
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
@@ -13,6 +13,12 @@ class SubredditAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     list_display = ['name']
 
 admin.site.register(Subreddit, SubredditAdmin)
+
+class RedditBotAccountAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+    list_display = ['client_id', 'client_secret', 'categorization_complete_email_recipient', 'is_active', 'last_run']
+    list_filter = ['categorization_complete_email_recipient', 'is_active', 'last_run']
+
+admin.site.register(RedditBotAccount, RedditBotAccountAdmin)
 
 class PostLeadAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     list_display = (
@@ -36,6 +42,7 @@ class PostLeadAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     )
 
     list_filter = (
+        "account",
         "subreddit",
         "status",
         "service_category",
@@ -593,3 +600,9 @@ class PostLeadAdmin(ImportExportModelAdmin, admin.ModelAdmin):
         )
 
 admin.site.register(PostLead, PostLeadAdmin)
+
+class EmailForNotificationAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+    list_display = ['email']
+    search_fields = ['email']
+
+admin.site.register(EmailForNotification, EmailForNotificationAdmin)

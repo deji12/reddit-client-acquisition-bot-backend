@@ -2,14 +2,25 @@ import praw
 from prawcore.exceptions import Redirect, NotFound
 from .utils import format_timestamp, categorize, save_analyses
 from decouple import config as env_config
-from core.models import Subreddit, PostLead, Tracker
+from core.models import Subreddit, PostLead, Tracker, RedditBotAccount
+from django.utils import timezone
 
 def fetch_posts_from_subredits():
+
+    account = (
+        RedditBotAccount.objects
+        .filter(is_active=True)
+        .exclude(last_run__date=timezone.localdate())
+        .first()
+    )
+
+    if not (account.client_id and account.client_secret):
+        return "No client ID or secret found for this account"
     
     reddit = praw.Reddit(
-        client_id=env_config('READ_ACCOUNT_CLIENT_ID'),
-        client_secret=env_config('READ_ACCOUNT_CLIENT_SECRET'),
-        user_agent=env_config('READ_ACCOUNT_USER_AGENT'),
+        client_id=account.client_id,
+        client_secret=account.client_secret,
+        user_agent=account.user_agent
     )
 
     print('-> Initialized praw client')
@@ -27,7 +38,7 @@ def fetch_posts_from_subredits():
 
         try:
             print(f'-> Fetching posts for {subreddit.name}')
-            submissions = reddit.subreddit(subreddit_name).new(limit=3)
+            submissions = reddit.subreddit(subreddit_name).new(limit=env_config('MAX_POSTS_TO_FETCH', cast=int))
             
             for submission in submissions:
                 
@@ -47,6 +58,7 @@ def fetch_posts_from_subredits():
 
                 total_fetched += 1
 
+                post.account = account
                 post.subreddit = subreddit
                 post.author_username = submission.author
                 post.content = content
@@ -77,6 +89,8 @@ def reset_saved_posts():
 
 def categorize_posts():
 
+    bot_account = None
+
     subreddits = Subreddit.objects.all().prefetch_related('posts')
     chuncked_categorize_result = []
 
@@ -95,6 +109,9 @@ def categorize_posts():
             
             if post.categorized:
                 continue
+
+            if bot_account is None:
+                bot_account = post.account
 
             post_summary = {
                 "id": post.post_id,
@@ -141,3 +158,6 @@ def categorize_posts():
         PostLead.objects.filter(
             id__in=awaiting_categorization
         ).update(categorized=True)
+
+    bot_account.last_run = timezone.now()
+    bot_account.save(update_fields=['last_run'])
